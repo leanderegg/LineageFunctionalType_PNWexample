@@ -15,6 +15,7 @@ require(RColorBrewer)
 require(dplyr)
 require(MuMIn)
 require(ggplot2)
+require(brranching)
 source("/Users/leeanderegg/Desktop/R functions, general/ggplot_helpers.R")
 ##### Variance Decomp of LES dataset for LFT analysis ######
 
@@ -330,16 +331,6 @@ r.squaredGLMM(AlAsvar.all.noh)
 Al.As_pure_n <- c(length(unique(baad$family[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)])),length(unique(baad$genus[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)])),length(unique(baad$speciesMatched[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)])),length(baad$family[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)]) )
 Al.As_all_n <- c(length(unique(baad$family[which(!is.na(baad$Al.As.all) & baad$h.t>0)])),length(unique(baad$genus[which(!is.na(baad$Al.As.all)& baad$h.t>0)])),length(unique(baad$speciesMatched[which(!is.na(baad$Al.As.all)& baad$h.t>0)])),length(baad$family[which(!is.na(baad$Al.As.all)& baad$h.t>0)]) )
 
-# #new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)])
-# # note: as of 4/29/19 i just copied the new Al_As column to the old spreadsheet
-# #new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)], AlAsvariance.pure$scaledVar[c(3,2,1,4)], Al.As_pure_n, AlAsvariance.all$scaledVar[c(3,2,1,4)], Al.As_all_n, AlAsvariance.all.noh$scaledVar[c(3,2,1,4)])
-# # note: as of 5/31/19 I added Al_As.pure and Al_As.all
-# new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)], AlAsvariance.pure$scaledVar[c(3,2,1,4)], Al.As_pure_n, Al.As_all_n, AlAsvariance.all$scaledVar[c(3,2,1,4)], AlAsvariance.all.noh$scaledVar[c(3,2,1,4)], AlAsvariance.all$vcov[c(3,2,1,4)], AlAsvariance.all.noh$vcov[c(3,2,1,4)])
-# # note: as of 8/19/19 I added unscaled variances and updated the weight to have a slope per species
-# 
-# colnames(new.vardecomps.forann) <- c("TaxoLeve","WD","Al.As_pure", "Al.As_pure_wheight","pure_wheight_n", "all_wheight_n","Al.As_all_wheight", "Al.As_all_noheight", "Al.As_all_wheight_raw", "Al.As_all_noheight_raw" )
-
-
 # combine all variance estimates, leaving out "Project"
 # updated 06.17.21 to bring in Al:As
 traitvars <- data.frame(LMAvariance[which(LMAvariance$grp !="Project"),4], LLvariance[which(LLvariance$grp !="Project"),4], Nmassvariance[which(Nmassvariance$grp !="Project"),4], Nareavariance[which(Nareavariance$grp !="Project"),4],
@@ -387,26 +378,6 @@ legend(xpd=NA, x = 11, y=0.7, legend=rev(c("btw Fams","btw Gen","btw Spp","w/in 
 
 
 
-# #### Plotting Subset for Presentation ########
-# ## making everything the same size as the Ecol Let Vardecmp FIG 1
-# quartz(width=4.33, height=4.73)
-# par(mfrow=c(2,2), mgp=c(2,.7,0), cex.lab=1.1, cex.axis=1.1, mar=c(4.5,2,1.5,2),oma=c(0,2,3.8,0))
-# 
-# bp <-barplot(as.matrix(baadtraitvars_scaled3[,c("BAADrawWD","LMF","logHeight","logAGB_BGB"),]),beside=F,legend.text = F,xpd = T,las=2,args.legend = list(x=4, y=1.3, ncol=2), col = paste0(cols,"99")
-#              , names.arg = c("","","","")#c("Wood Density","Leaf Mass Fraction","log(Height)","AboveGrnd:BelowGrnd\nbiomass") #c("log(WD)","raw WD", "Leaf Mass\nFraction", "log(Height)","AboveGrnd:\nBelowGrnd\nbiomass")
-#              , ylab= "Proportion of total Variance" #ylab="Proportion of total Variance\n(log traits)"
-#              , xlab="", mgp=c(2.5,.8,0))
-# #legend(xpd=T, x = 0, y=1.2, legend=rev(c("btw Fams","w/in Fam","w/in Gen","w/in Spp")), fill=rev(paste0(cols,"99")), ncol=2, bty="n",  cex=1.2)
-# #text(x = bp, y= par("usr")[3]-.05,labels =  c(expression(paste(log[10](LMA))), expression(paste(log[10](LL))),expression(paste(log[10](N[mass]))),expression(paste(log[10](N[area])))), srt=40, adj=1,xpd=NA, cex=1.4, font=1)
-# #mtext("a)", side=3, adj=-.1, line=1.3)
-# mtext("Proportion of Total Variance", side=2, line=2.8)
-# text(x = bp, y= par("usr")[3]-.05,labels =  c("Wood Density", "Leaf Mass Fraction",expression(paste(log[10](Height))),expression(paste(M[AbvGr]:M[BlwGr]))), srt=40, adj=1,xpd=NA, cex=1.1, font=1)
-# 
-# 
-# 
-
-
-
 
 
 
@@ -420,8 +391,8 @@ legend(xpd=NA, x = 11, y=0.7, legend=rev(c("btw Fams","btw Gen","btw Spp","w/in 
 #_______________________________________________________________________________
 
 # bring in full GLOPNET+ database from Anderegg et al. 2018 Eco Let
+# stored as data.all above
 
-data.all <- read.csv("/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/FinalExample/DerivedData/AllTraitData_for_Anderegg_etal_2018_EcolLet.csv", header=T, row.names = 1)
 # fix some misnamed oak families
 data.all$Family[which(data.all$Family=="Facaeae")] <- "Fagaceae"
 # calculate spp averages
@@ -479,11 +450,11 @@ allfam$log12.LL <- with(allfam, log(10^log.LL, base=12))
 
 common.gens <- names(which(xtabs(~Genus, allspp[which(allspp$log.LL>0),])>=5))
 
-# figure out range within genera
-genLLrange <- data.all %>% group_by (Genus) %>% summarise(minLL = min(log12.LL, na.rm=T), maxLL= max(log12.LL, na.rm=T), minT = min(MAT, na.rm=T), n=n()-length(which(is.na(log12.LL))))
-
-# ID genera that have deciduous and evergreen spp
-flipfloppers <- genLLrange[which(genLLrange$minLL<1 & genLLrange$maxLL>1 & genLLrange$n>3),]
+# # figure out range within genera
+# genLLrange <- data.all %>% group_by (Genus) %>% summarise(minLL = min(log12.LL, na.rm=T), maxLL= max(log12.LL, na.rm=T), minT = min(MAT, na.rm=T), n=n()-length(which(is.na(log12.LL))))
+# 
+# # ID genera that have deciduous and evergreen spp
+# flipfloppers <- genLLrange[which(genLLrange$minLL<1 & genLLrange$maxLL>1 & genLLrange$n>3),]
 
 
 quartz(width=4.4, height=3.8)
@@ -561,9 +532,12 @@ require(dplyr)
 require(tidyverse)
 
 ### step one: Make a Species List ###############3
+ # using cleaned plot inventory data and trait data from :
+# Law, B. E., & Berner, L. T. (2015, July 20). NACP TERRA-PNW: Forest Plant Traits, NPP, Biomass, Soil Properties.
+# as used in Anderegg, L. D. L., Berner, L. T., Badgley, G., Sethi, M. L., Law, B. E., & Hillerislambers, J. (2018). Within-species patterns challenge our understanding of the leaf economics spectrum. Ecology Letters, 21(5), 734–744. https://doi.org/10.1093/aob/mcu077
 
-biomass <- read.csv("/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/FinalExample/DerivedData/PNW_Biomass_data_for_Anderegg_etal_2018_EcolLet.csv", header=T, row.names=1)
-traits <- read.csv("/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/FinalExample/DerivedData/PNW_Trait_data_for_Anderegg_etal_2018_EcolLet.csv", header=T, row.names=1)
+biomass <- read.csv(paste0(local.directory,"/PNW_Biomass_data_for_Anderegg_etal_2018_EcolLet.csv"), header=T, row.names=1)
+traits <- read.csv(paste0(local.directory,"/PNW_Trait_data_for_Anderegg_etal_2018_EcolLet.csv"), header=T, row.names=1)
 
 
 spp.codes <- traits %>% group_by(GE.SP, Family) %>% summarise(Code=unique(SP.ID), fullspp = unique(FullSpecies), n_traits=n())
@@ -583,6 +557,7 @@ Spp.descriptions$Family <- spp.codes$Family[match(sppordered,spp.codes$fullspp)]
 ## clean the names with taxize:
 #taxize::use_entrez()
 #usethis::edit_r_environ()
+
 spplist_phylo <- phylomatic_names(spplist)
 spp_phylo <- phylomatic(spplist_phylo)
 
@@ -610,10 +585,10 @@ nacp.sums <- left_join(Spp.descriptions, tot_bio, by=c("SP.ID"="Species"))
 
 
 xtabs(~GE.SP, traits)
-write.csv(nacp.sums, "SpeciesSummaries_forLFTanalysis_V1.csv")
+#write.csv(nacp.sums, "SpeciesSummaries_forLFTanalysis_V1.csv")
 
 #### ** note: I manually added in some columns about dominance and also the first few LFTs
-nacp.sums <- read.csv("/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/SpeciesSummaries_forLFTanalysis_V2.csv")
+nacp.sums <- read.csv(paste0(local.directory,"/SpeciesSummaries_forLFTanalysis_V2.csv"))
 
 
 
@@ -995,7 +970,8 @@ CWexplans <- data.frame(Type = c("PFT","Deep LFT", "Mid LFT", "Shallow LFT"),
                                   summary(lm(cw_Nmassp_if~Mid.LFT.Nmass, biomass))$r.squared,
                                   summary(lm(cw_Nmassp_if~Shallow.LFT.Nmass, biomass))$r.squared))
 
-rowMeans(CWexplans[,-1])
+# among community variance explained for Fig 2
+rowMeans(log.CWexplans[,-1])
 
 
 
@@ -1269,19 +1245,33 @@ Deep.LFT.params$Ks[which(Deep.LFT.params$Deep.LFT=="Pinaceae")] <- mean(xft$Ks[w
 
 Shallow.LFT.params <- traits[-which(is.na(traits$Shallow.LFT.larix)),] %>% group_by(Shallow.LFT.larix) %>% summarise (LMA = mean(LMA, na.rm=T), LeafLife=mean(LEAF_LIFE, na.rm=T), Nmass=mean(LEAF_NITROGEN, na.rm=T))
 Shallow.LFT.params$P50 <- NA
-Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT=="Angio")] <- mean(xft$P50[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
-#angio = biom=TMR/TMS, growth form=T/S group=Angiosperm
-Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT=="Cupressaceae")] <- mean(xft$P50[which(xft$Cleaned.family =="Cupressaceae")], na.rm=T)
+
+# angiosperms
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Asterid")] <- mean(xft$P50[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Rosid")] <- mean(xft$P50[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+#Pinaceae
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Abies")] <- mean(xft$P50[which(xft$Cleaned.genus =="Abies")], na.rm=T)
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Larix")] <- mean(xft$P50[which(xft$Cleaned.genus =="Larix")], na.rm=T)
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Picea")] <- mean(xft$P50[which(xft$Cleaned.genus =="Picea")], na.rm=T)
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Pinus")] <- mean(xft$P50[which(xft$Cleaned.genus =="Pinus")], na.rm=T)
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Psue")] <- mean(xft$P50[which(xft$Cleaned.genus =="Pseudotsuga")], na.rm=T)
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Tsuga")] <- mean(xft$P50[which(xft$Cleaned.genus =="Tsuga")], na.rm=T)
 # Cuppressaceae 
-Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT=="Pinaceae")] <- mean(xft$P50[which(xft$Cleaned.family=="Pinaceae")], na.rm=T)
-# Pinaceae
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Cupressaceae")] <- mean(xft$P50[which(xft$Cleaned.family =="Cupressaceae")], na.rm=T)
+
 
 Shallow.LFT.params$Ks <- NA
-Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT=="Angio")] <- mean(xft$Ks[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
-#angio = biom=TMR/TMS, growth form=T/S group=Angiosperm
-Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT=="Cupressaceae")] <- mean(xft$Ks[which(xft$Cleaned.family =="Cupressaceae")], na.rm=T)
+# angiosperms
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Asterid")] <- mean(xft$Ks[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Rosid")] <- mean(xft$Ks[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+#Pinaceae
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Abies")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Abies")], na.rm=T)
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Larix")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Larix")], na.rm=T)
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Picea")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Picea")], na.rm=T)
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Pinus")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Pinus")], na.rm=T)
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Psue")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Pseudotsuga")], na.rm=T)
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Tsuga")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Tsuga")], na.rm=T)
 # Cuppressaceae 
-Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT=="Pinaceae")] <- mean(xft$Ks[which(xft$Cleaned.family=="Pinaceae")], na.rm=T)
-# Pinaceae
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Cupressaceae")] <- mean(xft$Ks[which(xft$Cleaned.family =="Cupressaceae")], na.rm=T)
 
 
