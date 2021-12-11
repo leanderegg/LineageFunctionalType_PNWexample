@@ -30,7 +30,7 @@ palette(mypal)
 # set the colors that wil denote within-species, within-genus, within family and across CWMs
 colchoices <- c(1,2,4,3,6)
 
-
+local.directory <- "/Users/leeanderegg/Dropbox/LFTs/public_data"
 
 
 
@@ -89,18 +89,16 @@ baad$log.lm.dbh <- log(baad$lm.dbh, base=10)
 ####### Global Wood Density Database ######
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-GWD <- read.csv("/Users/leeanderegg/Dropbox/WD project/GlobalWoodDensityDatabase.csv", header=T)
+# download the Global Wood Density Database from:
+# https://datadryad.org/stash/dataset/doi:10.5061/dryad.234
+# -> save the data as .csv in your local directory
+
+GWD <- read.csv(paste0(local.directory,"/GlobalWoodDensityDatabase.csv"), header=T)
 GWD$Genus <- factor(sapply(X=as.character(GWD$Binomial), FUN = function(x){strsplit(x, split = " ")[[1]][1]}))
 # bunch of replicated genera, and 100+ families.
 
-colnames(GWD)[4] <- "WD"
+colnames(GWD)[grep("Wood.density", colnames(GWD))] <- "WD"
 
-# #WDvar2 <- lmer(WD~ 1 + (1|Genus/Binomial), GWD)
-# WDvar2 <- lmer(WD~ 1 + (1|Family) + (1|Genus) + (1|Binomial), GWD)
-# logWDvar2 <- lmer(log(WD, base=10)~ 1 + (1|Family) + (1|Genus) + (1|Binomial), GWD)
-# 
-# rawWDvariance2 <- data.frame(VarCorr(WDvar2))
-# WDvariance2 <- data.frame(VarCorr(logWDvar2))
 
 
 
@@ -161,7 +159,7 @@ baad$Al.As.all[which(is.na(baad$Al.As))] <- baad$Al.As.others[which(is.na(baad$A
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-RtS <- read.csv("/Users/leeanderegg/Desktop/LFT_analysis/nph14863-sup-0002-NotesS1.csv", header=T)
+RtS <- read.csv(paste0(local.directory,"/nph14863-sup-0002-NotesS1.csv"), header=T)
 RtS$vegetationTYPE[which(RtS$vegetationTYPE=="TropMF ")] <- "TropMF"
 RtS$vegetationTYPE[which(RtS$vegetationTYPE=="PlantTem ")] <- "PlantTem"
 RtS$vegetationTYPE <- factor(RtS$vegetationTYPE)
@@ -176,7 +174,7 @@ RtS$taper <- RtS$DBH_cm/RtS$H_m
 
 ######## Xylem Functional Traits Database XFT #################
   # note: exported from Xylem functional traits database Master 13 March 2015.xls but had to change a bunch of column names
-xft <- read.csv("/Users/leeanderegg/Desktop/LFT_analysis/XFT_traits_13_March_2015.csv", header=T,na.strings = "")
+xft <- read.csv(paste0(local.directory,"/XFT_traits_13_March_2015.csv"), header=T,na.strings = "")
   # turns out there are 300+ uncleaned species
 xft$Cleaned.family <- as.character(xft$Cleaned.family)
 xft$Cleaned.family[which(is.na(xft$Cleaned.binomial))] <- xft$Family[which(is.na(xft$Cleaned.binomial))]
@@ -213,7 +211,7 @@ xft$P50 <- as.numeric(xft$P50)
 # the plan: includ - LMA, Nmass, LL, WD, RSR, P50, Ks
 
 ##### . LMA, Nmass & LL ###########
-data.all <- read.csv("/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/FinalExample/DerivedData/AllTraitData_for_Anderegg_etal_2018_EcolLet.csv", header=T, row.names = 1)
+data.all <- read.csv(paste0(local.directory,"/AllTraitData_for_Anderegg_etal_2018_EcolLet.csv"), header=T, row.names = 1)
 
 ## with all spp used for the hierarchical analysis
 logLMAvar <- lmer(log.LMA~ 1 + (1|Project) + (1|Family) + (1|Genus) + (1|Species), data.all)
@@ -332,22 +330,20 @@ r.squaredGLMM(AlAsvar.all.noh)
 Al.As_pure_n <- c(length(unique(baad$family[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)])),length(unique(baad$genus[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)])),length(unique(baad$speciesMatched[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)])),length(baad$family[which(baad$Al.As_type %in% c("direct.dbh","direct.basal") & baad$h.t>0)]) )
 Al.As_all_n <- c(length(unique(baad$family[which(!is.na(baad$Al.As.all) & baad$h.t>0)])),length(unique(baad$genus[which(!is.na(baad$Al.As.all)& baad$h.t>0)])),length(unique(baad$speciesMatched[which(!is.na(baad$Al.As.all)& baad$h.t>0)])),length(baad$family[which(!is.na(baad$Al.As.all)& baad$h.t>0)]) )
 
-#new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)])
-# note: as of 4/29/19 i just copied the new Al_As column to the old spreadsheet
-#new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)], AlAsvariance.pure$scaledVar[c(3,2,1,4)], Al.As_pure_n, AlAsvariance.all$scaledVar[c(3,2,1,4)], Al.As_all_n, AlAsvariance.all.noh$scaledVar[c(3,2,1,4)])
-# note: as of 5/31/19 I added Al_As.pure and Al_As.all
-new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)], AlAsvariance.pure$scaledVar[c(3,2,1,4)], Al.As_pure_n, Al.As_all_n, AlAsvariance.all$scaledVar[c(3,2,1,4)], AlAsvariance.all.noh$scaledVar[c(3,2,1,4)], AlAsvariance.all$vcov[c(3,2,1,4)], AlAsvariance.all.noh$vcov[c(3,2,1,4)])
-# note: as of 8/19/19 I added unscaled variances and updated the wheight to have a slope per species
-
-colnames(new.vardecomps.forann) <- c("TaxoLeve","WD","Al.As_pure", "Al.As_pure_wheight","pure_wheight_n", "all_wheight_n","Al.As_all_wheight", "Al.As_all_noheight", "Al.As_all_wheight_raw", "Al.As_all_noheight_raw" )
-#write.csv(new.vardecomps.forann, file = "/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/Al_As-vardecom-forAnna-20190603.csv" )
-#new.vardecoms.forann <- read.csv("/Users/leeanderegg/Dropbox/NACP_Traits/NACP_Traits_Rcode/Al_As-vardecom-forAnna-20190603.csv")
+# #new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)])
+# # note: as of 4/29/19 i just copied the new Al_As column to the old spreadsheet
+# #new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)], AlAsvariance.pure$scaledVar[c(3,2,1,4)], Al.As_pure_n, AlAsvariance.all$scaledVar[c(3,2,1,4)], Al.As_all_n, AlAsvariance.all.noh$scaledVar[c(3,2,1,4)])
+# # note: as of 5/31/19 I added Al_As.pure and Al_As.all
+# new.vardecomps.forann <- data.frame(rawWDvariance3[c(3,2,1,4),c("grp","scaledVar")], AlAsvariance$scaledVar[c(3,2,1,4)], AlAsvariance.pure$scaledVar[c(3,2,1,4)], Al.As_pure_n, Al.As_all_n, AlAsvariance.all$scaledVar[c(3,2,1,4)], AlAsvariance.all.noh$scaledVar[c(3,2,1,4)], AlAsvariance.all$vcov[c(3,2,1,4)], AlAsvariance.all.noh$vcov[c(3,2,1,4)])
+# # note: as of 8/19/19 I added unscaled variances and updated the weight to have a slope per species
+# 
+# colnames(new.vardecomps.forann) <- c("TaxoLeve","WD","Al.As_pure", "Al.As_pure_wheight","pure_wheight_n", "all_wheight_n","Al.As_all_wheight", "Al.As_all_noheight", "Al.As_all_wheight_raw", "Al.As_all_noheight_raw" )
 
 
 # combine all variance estimates, leaving out "Project"
 # updated 06.17.21 to bring in Al:As
 traitvars <- data.frame(LMAvariance[which(LMAvariance$grp !="Project"),4], LLvariance[which(LLvariance$grp !="Project"),4], Nmassvariance[which(Nmassvariance$grp !="Project"),4], Nareavariance[which(Nareavariance$grp !="Project"),4],
-                        rawWDvariance3[,4], P50variance[,4],Ksvariance[,4], logRSRvariance[,4], new.vardecoms.forann[new.vardecoms.forann$X,"Al.As_all_noheight"])
+                        rawWDvariance3[,4], P50variance[,4],Ksvariance[,4], logRSRvariance[,4], AlAsvariance.all.noh[,4])
 colnames(traitvars) <- c("logLMA", "logLL", "logNmass", "logNarea", "WD","logP50","logKs","logRSR","logAlAs")
 rownames(traitvars) <- c("BtwSpecies", "BtwGenera", "BtwFamilies", "WtinSpecies")
 
@@ -1272,6 +1268,20 @@ Deep.LFT.params$Ks[which(Deep.LFT.params$Deep.LFT=="Pinaceae")] <- mean(xft$Ks[w
 ###############. Shallow LFTs ################
 
 Shallow.LFT.params <- traits[-which(is.na(traits$Shallow.LFT.larix)),] %>% group_by(Shallow.LFT.larix) %>% summarise (LMA = mean(LMA, na.rm=T), LeafLife=mean(LEAF_LIFE, na.rm=T), Nmass=mean(LEAF_NITROGEN, na.rm=T))
+Shallow.LFT.params$P50 <- NA
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT=="Angio")] <- mean(xft$P50[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+#angio = biom=TMR/TMS, growth form=T/S group=Angiosperm
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT=="Cupressaceae")] <- mean(xft$P50[which(xft$Cleaned.family =="Cupressaceae")], na.rm=T)
+# Cuppressaceae 
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT=="Pinaceae")] <- mean(xft$P50[which(xft$Cleaned.family=="Pinaceae")], na.rm=T)
+# Pinaceae
 
+Shallow.LFT.params$Ks <- NA
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT=="Angio")] <- mean(xft$Ks[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+#angio = biom=TMR/TMS, growth form=T/S group=Angiosperm
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT=="Cupressaceae")] <- mean(xft$Ks[which(xft$Cleaned.family =="Cupressaceae")], na.rm=T)
+# Cuppressaceae 
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT=="Pinaceae")] <- mean(xft$Ks[which(xft$Cleaned.family=="Pinaceae")], na.rm=T)
+# Pinaceae
 
 
