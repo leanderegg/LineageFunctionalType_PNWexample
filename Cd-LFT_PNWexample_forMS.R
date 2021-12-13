@@ -3,8 +3,15 @@
 # An evolutionary approach to making ‘Functional Types’ functional"
 ######################################################################3
 
-# last updated 10.8.21 by ldla
+# NOTE: DATA FILES USED IN CODE ARE NOT POSTED IN Github REPO TO AVOID 
+#       VERSIONING CONFLICTS WITH PUBLIC DATABASES.
+#       Please email Leander Anderegg (landeregg@ucsb.edu or leanderegg@gmail.com)
+#       for formatted datasets called by this code (i.e. plug and play versions of the public datasets)
+#       But please cite the original data sources!
+
+# last updated 12.13.21 by ldla
 # previous files: Cd-LFT_testVardecompd.R; CutCode_forLFTanalysis.R
+
 
 ##### Load Packages
 require(tidyr)
