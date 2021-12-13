@@ -1243,12 +1243,31 @@ Deep.LFT.params$Ks[which(Deep.LFT.params$Deep.LFT=="Pinaceae")] <- mean(xft$Ks[w
 
 ###############. Shallow LFTs ################
 
-Shallow.LFT.params <- traits[-which(is.na(traits$Shallow.LFT.larix)),] %>% group_by(Shallow.LFT.larix) %>% summarise (LMA = mean(LMA, na.rm=T), LeafLife=mean(LEAF_LIFE, na.rm=T), Nmass=mean(LEAF_NITROGEN, na.rm=T))
-Shallow.LFT.params$P50 <- NA
+# getting higher taxonomic info for xft
+familylist <- unique(xft$Family[which(xft$Ks>0 & xft$Group=="Angiosperm")])
 
+
+clade <- rep(NA, length(familylist))
+  for (i in 1:length(familylist)){
+    tmp <- taxize::classification(familylist[i], db="ncbi")[[1]]
+    if(length(names(tmp))<1){clade[i]<- "unknown"}
+    else{
+      if(length(grep("rosids",tmp$name))>0){
+        clade[i] <- "rosids"}
+      if(length(grep("asterids",tmp$name))>0){
+        clade[i] <- "asterids"}
+      if(is.na(clade[i])){ clade[i] <- "other"}
+    }
+  }
+# match rosid and asterid families to their clade
+xft$rosid_asterid <- clade[match(xft$Family, familylist)]
+
+Shallow.LFT.params <- traits[-which(is.na(traits$Shallow.LFT.larix)),] %>% group_by(Shallow.LFT.larix) %>% summarise (LMA = mean(LMA, na.rm=T), LeafLife=mean(LEAF_LIFE, na.rm=T), Nmass=mean(LEAF_NITROGEN, na.rm=T))
+
+Shallow.LFT.params$P50 <- NA
 # angiosperms
-Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Asterid")] <- mean(xft$P50[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
-Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Rosid")] <- mean(xft$P50[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Asterid")] <- mean(xft$P50[which(xft$rosid_asterid =="asterids" & xft$Plant.organ =="S")], na.rm=T) 
+Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Rosid")] <- mean(xft$P50[which(xft$rosid_asterid =="rosids" & xft$Plant.organ =="S")], na.rm=T) 
 #Pinaceae
 Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Abies")] <- mean(xft$P50[which(xft$Cleaned.genus =="Abies")], na.rm=T)
 Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Larix")] <- mean(xft$P50[which(xft$Cleaned.genus =="Larix")], na.rm=T)
@@ -1262,8 +1281,8 @@ Shallow.LFT.params$P50[which(Shallow.LFT.params$Shallow.LFT.larix=="Cupressaceae
 
 Shallow.LFT.params$Ks <- NA
 # angiosperms
-Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Asterid")] <- mean(xft$Ks[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
-Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Rosid")] <- mean(xft$Ks[which(xft$Biome %in% c("TMR","TMS") & xft$Growth.form %in% c("T","S") & xft$Group=="Angiosperm" & xft$Plant.organ =="S")], na.rm=T) 
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Asterid")] <- mean(xft$Ks[which(xft$rosid_asterid =="asterids" & xft$Plant.organ =="S")], na.rm=T) 
+Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Rosid")] <- mean(xft$Ks[which(xft$rosid_asterid =="rosids" & xft$Plant.organ =="S")], na.rm=T) 
 #Pinaceae
 Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Abies")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Abies")], na.rm=T)
 Shallow.LFT.params$Ks[which(Shallow.LFT.params$Shallow.LFT.larix=="Larix")] <- mean(xft$Ks[which(xft$Cleaned.genus =="Larix")], na.rm=T)
